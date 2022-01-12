@@ -2,12 +2,14 @@ import React, { Component } from "react";
 import Table from "./TableComponent";
 import * as APIDirectory from "../APIDirectory";
 import axios from "axios";
+import { imageAlbum } from "../imageAlbum";
 
 export class PaginatedList extends Component {
   constructor(props) {
     super(props);
     this.state = {
       sales: [], //the array of sales from the server side
+      isLoading:false,//loader boolean
       rows: [], //structure of row as desired by the table component
     };
     this.headerList = this.getHeaderList(); // the table header array
@@ -18,6 +20,9 @@ export class PaginatedList extends Component {
   }
 
   fetchPaginatedList = async () => {
+   this.setState({
+      isLoading:true
+    })
     let url = APIDirectory.getSales("Pending");
     let salesList = await axios.get(url); // fetching the sales that are pending as we are showing the over due orders
     if (salesList.status === 200) {
@@ -29,6 +34,7 @@ export class PaginatedList extends Component {
     if (rows) {
       this.setState({
         rows: rows,
+        isLoading:false
       });
     }
   };
@@ -121,6 +127,12 @@ export class PaginatedList extends Component {
 
   render() {
     return (
+      this.state.isLoading?
+      <div
+      align='center'
+      style={componentStyles.loaderContainer}>
+      <img alt="Loading..." src={imageAlbum.spinner} style={{ textDecoration: "none" }} />
+    </div>:
       <div
         style={componentStyles.containerStyle}
       >
@@ -139,5 +151,12 @@ export default PaginatedList;
 const componentStyles={
   containerStyle:{
     margin: "100px 200px 200px",
-  }
+  },
+    loaderContainer:{ 
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100%',
+    flexDirection:'column'
+}
 }
